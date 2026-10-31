@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>一人分の人生 — 試作版</title>
+<style>
+:root{--paper:#eee9dc;--ink:#282820;--muted:#716f62;--line:#c9c2b1;--panel:#f8f5ec;--accent:#52634d;--red:#8a5148}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;line-height:1.65}
+header{background:#343b32;color:#f4f0e5;padding:22px 18px;border-bottom:4px solid #78816a}
+header .eyebrow{font:11px/1.4 sans-serif;letter-spacing:.18em;color:#c8cbbd}
+header h1{font-size:clamp(23px,5vw,32px);font-weight:500;margin:5px 0}
+header p{margin:0;color:#d4d4c8;font:13px sans-serif}
+main{max-width:900px;margin:22px auto;padding:0 14px 40px}
+.panel{background:var(--panel);border:1px solid var(--line);padding:17px;margin:0 0 15px;box-shadow:0 2px 5px #403b2910}
+h2{font-size:17px;font-weight:600;margin:0 0 12px;border-bottom:1px solid var(--line);padding-bottom:7px}
+h3{font-size:15px;margin:0 0 5px}
+.small{font:12px sans-serif;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{padding:8px 10px;border:1px solid var(--line);background:#f1eee4;font:13px sans-serif}
+.stat b{float:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;background:#e3e5d9;color:#354333;padding:2px 7px;font:11px sans-serif;margin:2px}
+button{font:14px sans-serif;cursor:pointer;border:1px solid #7c826f;background:#e9e8dc;color:#283026;padding:10px 12px}
+button:hover{background:#dfe3d4}
+button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:var(--accent);color:white;border-color:var(--accent)}
+.primary:hover{background:#3f503b}
+.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.action{min-height:80px;text-align:left;background:#f4f1e8}
+.action.selected{outline:2px solid var(--accent);background:#e4e8dc}
+.action span{display:block;font-weight:bold;margin-bottom:3px}
+.action small{display:block;color:var(--muted);font:11px/1.45 sans-serif}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.log{border-left:2px solid var(--line);padding:2px 0 2px 13px;margin:10px 0}
+.log time{font:11px sans-serif;color:var(--muted)}
+.log p{margin:3px 0}
+#notice{background:#e9e6d9;border-left:3px solid var(--accent);padding:10px 12px;margin-top:12px}
+#end{display:none;border:1px solid var(--red);padding:14px;background:#f3e9e4}
+footer{text-align:center;color:var(--muted);font:11px sans-serif;padding:10px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.actions{grid-template-columns:repeat(2,minmax(0,1fr))}main{margin-top:12px}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">A LIFE AMONG BILLIONS · PROTOTYPE 0.1</div>
+  <h1>一人分の人生</h1>
+  <p>第二次世界大戦下のソ連で生きた、一人の兵士の記録。</p>
+</header>
+<main>
+  <section class="panel">
+    <div class="row" style="justify-content:space-between">
+      <div><span class="tag">第一回生成・試作</span><span class="tag">1941年</span></div>
+      <button id="newLife">別の人生を生成</button>
+    </div>
+    <h2 style="margin-top:12px">主人公</h2>
+    <h3 id="name">アレクセイ・ミハイロヴィチ・ソコロフ</h3>
+    <div class="small" id="roman">Алексей Михайлович Соколов</div>
+    <div class="grid" style="margin-top:10px">
+      <div class="stat">生年・年齢 <b id="age">1921年・20歳</b></div>
+      <div class="stat">出身 <b id="origin">スモレンスク州</b></div>
+      <div class="stat">民族 <b id="ethnicity">ロシア人</b></div>
+      <div class="stat">入隊前の職業 <b id="job">農業従事者</b></div>
+      <div class="stat">家族 <b id="family">父・母・弟・妹</b></div>
+      <div class="stat">婚姻 <b id="marital">未婚</b></div>
+    </div>
+    <h2 style="margin-top:17px">これまでの人生</h2>
+    <p id="biography">アレクセイはスモレンスク州の農村で生まれた。幼い頃から家の手伝いをして育ち、学校を卒業した後は農業に従事していた。休日には近所の友人と過ごすこともあった。1941年、20歳になった彼のもとにも動員の知らせが届いた。</p>
+    <p class="small">入隊前は行動選択を行わず、これまでの人生を短い文章で紹介します。</p>
+  </section>
+
+  <section class="panel">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="border:0;margin:0;padding:0">現在の状況</h2>
+      <strong id="date">1941年6月</strong>
+    </div>
+    <p id="situation">ドイツ軍がソ連へ侵攻。アレクセイは動員され、軍に入隊した。</p>
+    <div class="grid" id="stats"></div>
+  </section>
+
+  <section class="panel" id="actionPanel">
+    <h2>今月の過ごし方</h2>
+    <p class="small">一つ選んでから「時間を進める」を押してください。行動の効果は簡略化された試作仕様です。</p>
+    <div class="actions" id="actions"></div>
+    <div class="row" style="margin-top:13px">
+      <button class="primary" id="advance" disabled>時間を進める</button>
+      <span class="small" id="selectedText">行動を選択してください。</span>
+    </div>
+    <div id="notice" aria-live="polite">1941年6月。軍での生活が始まった。</div>
+  </section>
+
+  <section class="panel">
+    <h2>人生の記録</h2>
+    <div id="journal"><div class="log"><time>1941年6月</time><p>アレクセイ・ソコロフは動員され、軍に入隊した。</p></div></div>
+  </section>
+
+  <section id="end">
+    <h2>記録の終了</h2>
+    <p id="ending"></p>
+    <button id="restart" class="primary">新しい人生を始める</button>
+  </section>
+  <footer>試作版 0.1 · この画面の統計・出来事・確率はゲーム動作確認用の仮設定です。</footer>
+</main>
+<script>
+const actionList=[
+ ["バランス","訓練・学習・交流・休息を平均的に行う。"],
+ ["訓練重視","軍事訓練を優先する。"],
+ ["学習重視","読み書きや知識の習得を優先する。"],
+ ["交流重視","戦友との交流を優先する。"],
+ ["健康重視","健康管理や体調の維持を優先する。"],
+ ["休息重視","睡眠や休息を優先する。"],
+ ["任務重視","軍務や規律を優先する。"],
+ ["個人時間重視","手紙や趣味など個人の時間を大切にする。"],
+ ["生活重視","身の回りのことや日常生活を優先する。"]
+];
+const initial={year:1941,month:6,abilities:{身体能力:64,健康:71,判断力:53,知識:42,協調性:57,規律:68,持久力:73,精神力:59},fatigue:15,alive:true,chosen:null,months:0};
+let state;
+const $=id=>document.getElementById(id);
+function fresh(){
+ state=JSON.parse(JSON.stringify(initial));
+ $("end").style.display="none";$("actionPanel").style.display="block";
+ $("name").textContent="アレクセイ・ミハイロヴィチ・ソコロフ";
+ $("roman").textContent="Алексей Михайлович Соколов";
+ $("age").textContent="1921年・20歳";$("origin").textContent="スモレンスク州";
+ $("ethnicity").textContent="ロシア人";$("job").textContent="農業従事者";
+ $("family").textContent="父・母・弟・妹";$("marital").textContent="未婚";
+ $("biography").textContent="アレクセイはスモレンスク州の農村で生まれた。幼い頃から家の手伝いをして育ち、学校を卒業した後は農業に従事していた。休日には近所の友人と過ごすこともあった。1941年、20歳になった彼のもとにも動員の知らせが届いた。";
+ $("situation").textContent="ドイツ軍がソ連へ侵攻。アレクセイは動員され、軍に入隊した。";
+ $("date").textContent="1941年6月";
+ $("notice").textContent="1941年6月。軍での生活が始まった。";
+ $("journal").innerHTML='<div class="log"><time>1941年6月</time><p>アレクセイ・ソコロフは動員され、軍に入隊した。</p></div>';
+ render();
+}
+function render(){
+ $("date").textContent=`${state.year}年${state.month}月`;
+ $("stats").innerHTML=Object.entries(state.abilities).map(([k,v])=>`<div class="stat">${k}<b>${v}</b></div>`).join("")+
+ `<div class="stat">疲労<b>${state.fatigue}</b></div>`;
+ $("actions").innerHTML=actionList.map(([name,desc],i)=>`<button class="action ${state.chosen===i?'selected':''}" data-i="${i}"><span>${i+1}. ${name}</span><small>${desc}</small></button>`).join("");
+ document.querySelectorAll(".action").forEach(b=>b.addEventListener("click",()=>{state.chosen=Number(b.dataset.i);render();}));
+ $("advance").disabled=state.chosen===null||!state.alive;
+ $("selectedText").textContent=state.chosen===null?"行動を選択してください。":`選択中：${actionList[state.chosen][0]}`;
+}
+function clamp(n){return Math.max(0,Math.min(100,n));}
+function advance(){
+ if(state.chosen===null||!state.alive)return;
+ const idx=state.chosen, name=actionList[idx][0], a=state.abilities;
+ let message="";
+ const change=(key,n)=>a[key]=clamp(a[key]+n);
+ switch(idx){
+ case 0: change("身体能力",1);change("知識",1);change("協調性",1);change("健康",1);state.fatigue=Math.max(0,state.fatigue-1);message="訓練や交流、休息を無理のない範囲で行った。";break;
+ case 1: change("身体能力",2);change("規律",2);change("持久力",1);state.fatigue+=5;message="訓練に多くの時間を費やした。疲労が蓄積した。";break;
+ case 2: change("知識",2);change("判断力",1);state.fatigue+=1;message="空いた時間を学習にあてた。";break;
+ case 3: change("協調性",2);change("精神力",1);state.fatigue=Math.max(0,state.fatigue-1);message="戦友たちと時間を過ごした。";break;
+ case 4: change("健康",2);change("持久力",1);state.fatigue=Math.max(0,state.fatigue-3);message="体調を整えることを優先した。";break;
+ case 5: change("健康",1);change("精神力",1);state.fatigue=Math.max(0,state.fatigue-8);message="休息を取った。疲労が軽くなった。";break;
+ case 6: change("規律",2);change("判断力",1);state.fatigue+=3;message="任務に集中して取り組んだ。";break;
+ case 7: change("精神力",2);change("知識",1);state.fatigue=Math.max(0,state.fatigue-1);message="手紙を書いたり、自分の時間を過ごした。";break;
+ case 8: change("健康",1);change("協調性",1);change("規律",1);state.fatigue=Math.max(0,state.fatigue-2);message="身の回りを整え、日常の用事を済ませた。";break;
+ }
+ state.fatigue=clamp(state.fatigue);
+ state.month++;if(state.month>12){state.month=1;state.year++;}
+ state.months++;
+ let historical="";
+ if(state.year===1941&&state.month===7) historical="前線では激しい戦闘が続き、部隊は移動を命じられた。";
+ else if(state.year===1941&&state.month===10) historical="秋が深まり、雨と泥濘が兵士たちの移動を難しくした。";
+ else if(state.year===1942&&state.month===1) historical="冬の寒さが厳しく、暖かい衣服や食料が重要になっていた。";
+ else if(state.months%4===0) historical="部隊では大きな変化はなかった。日々の任務が続いた。";
+ let log=message+(historical?" "+historical:"");
+ $("notice").textContent=log;
+ const entry=document.createElement("div");entry.className="log";
+ entry.innerHTML=`<time>${state.year}年${state.month}月</time><p>${escapeHtml(log)}</p>`;
+ $("journal").prepend(entry);
+ state.chosen=null;render();
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("advance").addEventListener("click",advance);
+$("newLife").addEventListener("click",()=>{if(confirm("現在の記録を終了して、別の人生を生成しますか？"))fresh();});
+$("restart").addEventListener("click",fresh);
+fresh();
+</script>
+</body>
+</html>
